@@ -1,0 +1,18 @@
+[project]
+name = "sound-mixer"
+version = "0.1.0"
+description = "gui for adjusting sound of windows apps"
+authors = [
+    {name = "Arseniy B",email = "arseniy.beltyukov@gmail.com"}
+]
+readme = "README.md"
+requires-python = "^3.12.8"
+dependencies = [
+    "nicegui (>=2.20.0,<3.0.0)",
+    "pycaw (>=20251023,<20251024)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
