@@ -1,8 +1,9 @@
-from nicegui import ui, app
+from nicegui import ui, app 
 from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
 from ctypes import cast, POINTER
-import threading
-import time
+import faulthandler
+
+faulthandler.enable(all_threads= True)
 
 
 def get_audio_sessions():
@@ -27,8 +28,7 @@ def build_ui():
         ui.label("Master Volume").classes("text-xl")
 
         # --- Master Volume Control ---
-        master_volume_slider = ui.slider(min=0, max=100, value=50, step=1)
-        master_volume_slider.on("update:model-value", lambda e: set_master_volume(e.value))
+        ui.slider(min=0, max=100, value=50, step=1).on("update:model-value", lambda e: set_master_volume(e))
 
     ui.separator()
 
@@ -40,20 +40,20 @@ def build_ui():
         session_container.clear()
 
         for session, simple_volume, name in get_audio_sessions():
-            row = ui.row().classes("items-center gap-4")
+            with ui.row().classes("items-center gap-4"):
 
-            ui.label(name).classes("w-48")
+                ui.label(name).classes("w-48")
 
-            current_vol = int(simple_volume.GetMasterVolume() * 100)
+                current_vol = int(simple_volume.GetMasterVolume() * 100)
 
-            slider = ui.slider(min=0, max=100, value=current_vol, step=1)
-            slider.on("update:model-value",
+                ui.slider(min=0, max=100, value=current_vol, step=1).on("update:model-value",
                       lambda e, sv=simple_volume: sv.SetMasterVolume(e.value / 100, None))
+                
 
-            mute_checkbox = ui.checkbox("Mute", value=simple_volume.GetMute())
-            mute_checkbox.on_change(lambda e, sv=simple_volume: sv.SetMute(e.value, None))
+                ui.checkbox("Mute", value=simple_volume.GetMute(),on_change= lambda e, sv=simple_volume: sv.SetMute(e, None))
+            # mute_checkbox.on_change(lambda e, sv=simple_volume: sv.SetMute(e.value, None))
 
-            row()
+            
 
     refresh_sessions()
 
@@ -61,7 +61,7 @@ def build_ui():
 
 
 # --- Master volume using pycaw ---
-def set_master_volume(value):
+def set_master_volume(event):
     devices = AudioUtilities.GetSpeakers()
     interface = devices.Activate(
         AudioUtilities.IAudioEndpointVolume._iid_,
@@ -69,10 +69,11 @@ def set_master_volume(value):
         None
     )
     volume = cast(interface, POINTER(AudioUtilities.IAudioEndpointVolume))
-    volume.SetMasterVolumeLevelScalar(value / 100, None)
+    volume.SetMasterVolumeLevelScalar(event.value / 100, None)
 
 
 # --- Run NiceGUI ---
-if __name__ == "__main__":
-    build_ui()
-    ui.run(port=8080)
+
+build_ui()
+ui.run(port=8080)
+
