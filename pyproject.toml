@@ -1,16 +1,18 @@
 [project]
-name = "sound-mixer"
+name = "soundmixer"
 version = "0.1.0"
 description = "gui for adjusting sound of windows apps"
 authors = [
     {name = "Arseniy B",email = "arseniy.beltyukov@gmail.com"}
 ]
 readme = "README.md"
-requires-python = "^3.12.8"
+requires-python = ">=3.12.8,<4.0.0"
 dependencies = [
+
     "nicegui (>=2.20.0,<3.0.0)",
-    "pycaw (>=20251023,<20251024)",
     "comtypes (>=1.4.13,<2.0.0)",
+    "psutil (>=7.2.0,<8.0.0)",
+    "pycaw (>=20251023,<20251024)",
 ]
 
 
